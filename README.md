@@ -6,7 +6,7 @@ swipe.js makes a table responsive with the idea of swiping a set of columns to r
 
 Best to work with tables for comparison.
 
-[SEE DEMO](https://github.com/npark8/responsive-div-table/blob/master/demo.html)
+[SEE DEMO](npark8.github.io/responsive-div-table/demo.html)
 
 References: 
   - [Original idea by tablwsaw-swipe mode](https://github.com/filamentgroup/tablesaw)
