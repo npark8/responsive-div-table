@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<title>Table template</title>
+	<link href="css/swipe.css" type="text/css" rel="stylesheet">
+	<link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/swipe.js" type="text/javascript"></script>
+	<script src="https://rawgit.com/andrewrjones/doubly-linked-list-js/master/doubly-linked-list.js"></script>
+	<script src="https://rawgit.com/mattbryson/TouchSwipe-Jquery-Plugin/master/jquery.touchSwipe.js"></script>
+	<script>
+	var colList = new DLL.DoublyLinkedList();
+	var currCol = null;
+	var prevCol = null;
+	var nextCol = null;
+	var prevScreen = null;
+	</script>
+	<!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+<div class="container">
+	<div id="pagetitle" style="border-bottom: 4px solid #7870E3;">
+		<h1 style="margin-bottom: 0px; border-top: 4px solid #5999D9;"><span style="font: bold, sans-serif; color:#6985DE">TABLE TEMPLATE</span></h1>
+	</div>
+</div>
+<div class="container">
+<a href="#!" id="showAllbtn" onClick="showAll()" class="btn btn-secondary" style="display:none;">Show all rows</a>
+	<br>
+	<br>
+	
+	<div class="buttons" align="right">
+		<button class="previous button" onClick="goToPrev()">&#8249;</button>
+		<button class="next button" onClick="goToNext()">&#8250;</button>
+	</div>
+	<!-- put colmn names as the first class element -->
+	<div class="divTable">
+		<!-- table thread -->
+		<div class="divTableHeading">
+			<div class="divTableRow">
+				<div class="col0 divTableHead">COMPARATOR COL</div>
+				<div class="col1 divTableHead center">COL1</div>
+				<div class="col2 divTableHead center ">COL2</div>
+				<div class="col3 divTableHead center ">COL3</div>
+				<div class="col4 divTableHead center ">COL4</div>
+				<div class="col5 divTableHead center ">COL5</div>
+			</div>
+		</div>
+		<!-- table tbody -->
+		<div class="divTableBody">
+		<!-- table tr -->
+				<div class="divTableRow">
+				<!-- table td -->
+				<div class="col0 divTableCell ">comparator 1<br /><br /></div>
+				<div class="col1 divTableCell center">col1-data1</div>
+				<div class="col2 divTableCell center">col2-data1</div>
+				<div class="col3 divTableCell center">col3-data1</div>
+				<div class="col4 divTableCell center">col4-data1</div>
+				<div class="col5 divTableCell center">col5-data1</div>
+			</div>
+			<div class="divTableRow">
+				<div class="col0 divTableCell ">comparator 2<br /><br /></div>
+				<div class="col1 divTableCell center">col1-data2</div>
+				<div class="col2 divTableCell center">col2-data2</div>
+				<div class="col3 divTableCell center">col3-data2</div>
+				<div class="col4 divTableCell center">col4-data2</div>
+				<div class="col5 divTableCell center">col5-data2</div>
+			</div>
+			<div class="divTableRow">
+				<div class="col0 divTableCell ">comparator 3<br /><br /></div>
+				<div class="col1 divTableCell center">col1-data3</div>
+				<div class="col2 divTableCell center">col2-data3</div>
+				<div class="col3 divTableCell center">col3-data3</div>
+				<div class="col4 divTableCell center">col4-data3</div>
+				<div class="col5 divTableCell center">col5-data3</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
