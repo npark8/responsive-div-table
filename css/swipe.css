@@ -1,0 +1,118 @@
+@media only screen and (max-width:480px) {
+	 .paragraph {
+		width: 50%!important;
+	}
+}
+
+@media only screen and (max-width:625px) {
+	 .center {
+		width: 25%;
+	}
+}
+
+@media only screen and (min-width:817px) {
+	.buttons{
+		display: none
+	}
+}
+/* DivTable.com */
+.divTable {
+	display: table;
+	width: 100%;
+}
+
+.divTableRow {
+	display: table-row;
+}
+
+.divTableHeading {
+	background-color: #EEE;
+	display: table-header-group;
+}
+
+.divTableCell,.divTableHead {
+	border-top: 1px solid #ddd;
+	display: table-cell;
+	padding: 3px 10px;
+}
+
+.divTableHead {
+	background-color: #875CE8;
+	color: #FFF
+}
+
+.divTableHeading {
+	background-color: #EEE;
+	display: table-header-group;
+	font-weight: bold;
+}
+
+.divTableFoot {
+	background-color: #EEE;
+	display: table-footer-group;
+	font-weight: bold;
+}
+
+.divTableBody {
+	display: table-row-group;
+}
+/* End of DivTable.com */
+.button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	box-sizing: border-box;
+	background-color: #fff;
+	border-radius: .25em;
+	display: inline-block;
+	padding: 0px 8px;
+	border: 1px solid #ccc
+}
+
+.button:hover {
+	background-color: lightgrey;
+	color: black !important;
+}
+
+.previous {
+	background-color: #f1f1f1;
+	color: black;
+}
+
+.next {
+	background-color: #f1f1f1;
+	color: black;
+}
+
+.btn-secondary {
+	padding: 12px 24px;
+	box-shadow: 0 1px 3px #666666;
+	border-radius: 3px;
+	font-size: 16px;
+	margin: 5px;
+	background-color: #d1ddeb;
+	border-color: #b2c6de;
+	color: #333333;
+}
+
+.btn-secondary:hover {
+	box-shadow: 0 1px 3px #666;
+	background-color: #b2c6de;
+	color: #333333;
+}
+
+.container {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+}
+
+.center {
+	text-align: center
+}
+
+.paragraph {
+	word-wrap: break-word;
+	width:33%;
+}
+
+
