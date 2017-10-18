@@ -1,12 +1,12 @@
 # responsive-div-table
 
-*Script was implemented for a fully accessible web page with div tag tables.* 
+*Script was implemented for a fully accessible web page with div tag tables. AODA friendly* 
 
 swipe.js makes a table responsive with the idea of swiping a set of columns to right or left in a smaller view. Swipe touch motions inputs are accepted in mobile/touch devices.
 
 Best to work with tables for comparison.
 
-SEE DEMO
+[SEE DEMO](https://github.com/npark8/responsive-div-table/blob/master/demo.html)
 
 References: 
   - [Original idea by tablwsaw-swipe mode](https://github.com/filamentgroup/tablesaw)
