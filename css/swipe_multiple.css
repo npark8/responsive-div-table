@@ -1,0 +1,108 @@
+@media only screen and (max-width:480px) {
+	 .paragraph {
+		width: 50%!important;
+	}
+}
+
+@media only screen and (max-width:625px) {
+	 .center {
+		width: 25%;
+	}
+}
+
+@media only screen and (min-width:817px) {
+	.buttons{
+		display: none
+	}
+}
+/* DivTable.com */
+.divTable {
+	display: table;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.divTableRow {
+	display: table-row;
+}
+
+.divTableHeading {
+	background-color: #EEE;
+	display: table-header-group;
+}
+
+.divTableCell,.divTableHead {
+	border: 1px solid #ddd;
+	display: table-cell;
+	padding: 3px 10px;
+}
+
+.divTableHead {
+	background-color: #875CE8;
+	color: #FFF
+}
+
+.divTableHeading {
+	background-color: #EEE;
+	display: table-header-group;
+	font-weight: bold;
+}
+
+.divTableFoot {
+	background-color: #EEE;
+	display: table-footer-group;
+	font-weight: bold;
+}
+
+.divTableBody {
+	display: table-row-group;
+}
+/* End of DivTable.com */
+.button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	box-sizing: border-box;
+	background-color: #fff;
+	border-radius: .25em;
+	display: inline-block;
+	padding: 6px 16px;
+	border: 1px solid #ccc;
+	font-size: 14px
+}
+
+.button:hover {
+	background-color: lightgrey;
+	color: black !important;
+	cursor: pointer;
+}
+
+.previous {
+	background-color: #f1f1f1;
+	color: black;
+}
+
+.next {
+	background-color: #f1f1f1;
+	color: black;
+}
+
+.container {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+}
+
+.center {
+	text-align: center
+}
+
+.paragraph {
+	word-wrap: break-word;
+	width:33%;
+}
+
+.fontStyle {
+	text-align:center;
+	font: bold, sans-serif;
+	color:#6985DE
+}
