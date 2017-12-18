@@ -28,12 +28,14 @@
  * */
 
 function SwipeTable(colList, btnPrev, btnNext) {
+	this.btnPrev = btnPrev;
+	this.btnNext = btnNext;
 	this.colList = colList;
+	this.fixedCol = null;
 	this.currCol = null;
 	this.prevCol = null;
 	this.nextCol = null;
-	this.btnPrev = btnPrev;
-	this.btnNext = btnNext;
+	this.tableNo = null;
 }
 
 /* initialize doubly linked lists for each swipe table */
@@ -44,13 +46,20 @@ SwipeTable.prototype.initCol = function() {
 		if (initialized)
 			break;
 		if (!$(elParent[i]).hasClass("initialized")) {
+			if ($(elParent[i]).hasClass("pass")) {
+				$(elParent[i]).addClass("initialized");
+				initialized = true;
+				break;
+			}
 			var el = elParent[i].getElementsByClassName("divTableRow");
+			this.tableNo = i;
 			// only need to parse the first header row, from second column (first is fixed)
 			if (el[0].children.length != 0) {
-				for (var j = 1; j < el[0].children.length; j++) {
-					var colName = "."
+				for (var j = 0; j < el[0].children.length; j++) {
+					var colName = ".divTable:eq("  + this.tableNo + ") ."
 						+ el[0]["children"][j].className.split(" ")[0];
-					this.colList.append(colName);
+					if(j==0) this.fixedCol = colName;
+					else this.colList.append(colName);
 				}
 				$(elParent[i]).addClass("initialized");
 				initialized = true;
@@ -72,44 +81,51 @@ SwipeTable.prototype.initCol = function() {
  * size before window resize
  */
 SwipeTable.prototype.init = function() {
-
-	// turn off both buttons at a desktop mode
-	// define global behavior for all table buttons
-	if ($(window).width() >= 800) {
-		$('.button').prop('disabled', true);
-		$('.button').css({
-			color : '#ccc'
-		});
-	} else {
-		// turn off previous button initially, change style to disabled
-		// set each of the column pointers
-		document.getElementsByClassName("button")[0].disabled = true;
-		$('.previous').css({
-			color : '#ccc'
-		});
-		this.currCol = this.colList.head().next;
-		this.prevCol = this.currCol.prev;
-		this.nextCol = this.currCol.next;
-		// only show the first three columns in tablet view
-		this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
-		// only show the first column in mobile view
-		// reset the pointer
-		var isTabletView = true;
-		if ($(window).width() <= 480) {
-			isTabletView = false;
-			this.currCol = this.colList.head();
-			this.prevCol = null;
-			this.nextCol = null;
+	if (this.currCol != null) {
+		// turn off both buttons at a desktop mode
+		// define global behavior for all table buttons
+		if ($(window).width() >= 800) {
+			$('.button').prop('disabled', true);
+			$('.button').css({
+				color : '#ccc'
+			});
+		} else {
+			// turn off previous button initially, change style to disabled
+			// set each of the column pointers
+			document.getElementsByClassName("button")[0].disabled = true;
+			$('.previous').css({
+				color : '#ccc'
+			});
+			// set tablet view column pointers accordingly if applicable
+			if(this.colList._length > 1){
+				this.currCol = this.colList.head().next;
+				this.prevCol = this.currCol.prev;
+				this.nextCol = this.currCol.next;
+			}
+			// only show the first three columns in tablet view
 			this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
+			
+			// only show the first column in mobile view
+			// reset the pointer
+			var flag = 0; //indicate tablet view
+			if ($(window).width() <= 480) {
+				flag = 1;//indicate mobile view
+				this.currCol = this.colList.head();
+				this.prevCol = null;
+				this.nextCol = null;
+				this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
+			}
+			this.determineButtonStatus(flag);
 		}
-		this.determineButtonStatus(isTabletView);
 	}
 };
 
 /*determines the visibility of swipe buttons based on the number of columns*/
-SwipeTable.prototype.determineButtonStatus = function(isTabletView){
+SwipeTable.prototype.determineButtonStatus = function(flag){
 	// do not show buttons on tablet mode if there are three or less columns 
-	if(isTabletView && (this.nextCol==null || this.nextCol.next==null)){
+	// same for mobile mode for one or zero column
+	if((flag==0 && (this.nextCol==null || this.nextCol.next==null))||
+			(flag==1 && (this.currCol==null || this.currCol.next==null))){
 		document.getElementById(this.btnNext).disabled = true;
 		$('#'+this.btnNext).css({
 			display : 'none'
@@ -126,7 +142,8 @@ SwipeTable.prototype.determineButtonStatus = function(isTabletView){
 			display : ''
 		});
 	}
-}
+};
+
 /* hides all columns except the column pointed by currCol */
 SwipeTable.prototype.hideAllExcept = function(currCol, prevCol, nextCol) {
 	if (currCol != null && prevCol == null && nextCol == null) {
@@ -161,82 +178,88 @@ SwipeTable.prototype.showAllCol = function() {
  */
 SwipeTable.prototype.reconfig = function() {
 	// mobile or tablet to desktop view
-	if ($(window).width() >= 800) {
-		$('.button').prop('disabled', true);
-		$('.button').css({
-			color : '#ccc'
-		});
-		this.showAllCol();
-		this.currCol = this.colList.head();
-		this.prevCol = null;
-		this.nextCol = null;
-	} else {
-		if ($(window).width() <= 480) {
-			// tablet to mobile view
-			// decrement column pointer to left most column of current window
-			// view
-			if (prevScreen > 480 && prevScreen < 800) {
-				if (this.prevCol != null) {
-					this.currCol = this.prevCol;
-				}
-			}// desktop to mobile view
+	if(this.colList._length > 1){
+		if ($(window).width() >= 800) {
+			$('.button').prop('disabled', true);
+			$('.button').css({
+				color : '#ccc'
+			});
+			this.showAllCol();
+			this.currCol = this.colList.head();
 			this.prevCol = null;
 			this.nextCol = null;
-			this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
-			this.determineButtonStatus(false);
-			this.updatePrevBtn();
-			this.updateNextBtn();
 		} else {
-			// desktop or mobile to tablet view
-			if (this.prevCol == null && this.nextCol == null) {
-				// mobile to tablet view
-				if (prevScreen <= 480) {
-					if (this.currCol.next != null
-							&& this.currCol.next.next != null) {
+			if ($(window).width() <= 480) {
+				// tablet to mobile view
+				// decrement column pointer to left most column of current window
+				// view
+				if (prevScreen > 480 && prevScreen < 800) {
+					if (this.prevCol != null) {
+						this.currCol = this.prevCol;
+					}
+				}// desktop to mobile view
+				this.prevCol = null;
+				this.nextCol = null;
+				this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
+				this.determineButtonStatus(1);
+				this.updatePrevBtn();
+				this.updateNextBtn();
+			} else {
+				// desktop or mobile to tablet view
+				if (this.prevCol == null && this.nextCol == null) {
+					// mobile to tablet view
+					if (prevScreen <= 480) {
+						if (this.currCol.next != null
+								&& this.currCol.next.next != null) {
+							this.prevCol = this.currCol;
+							this.currCol = this.currCol.next;
+							this.nextCol = this.currCol.next;
+						}
+						// currCol is second last column
+						else if (this.currCol.next != null) {
+							this.prevCol = this.currCol.prev;
+							this.nextCol = this.currCol.next;
+						}
+						// currCol is the last column
+						// decrement column pointer
+						else {
+							this.nextCol = this.currCol;
+							this.currCol = this.currCol.prev;
+							this.prevCol = this.currCol.prev;
+						}
+						this.hideAllExcept(this.currCol, this.prevCol,
+								this.nextCol);
+						this.updatePrevBtn();
+						this.updateNextBtn();
+					}
+					// desktop to tablet view
+					else {
+						this.init();
+					}
+				} else {// tablet to tablet view
+					// user previously looking at the first column
+					if (this.prevCol == null) {
 						this.prevCol = this.currCol;
 						this.currCol = this.currCol.next;
 						this.nextCol = this.currCol.next;
 					}
-					// currCol is second last column
-					else if (this.currCol.next != null) {
-						this.prevCol = this.currCol.prev;
-						this.nextCol = this.currCol.next;
-					}
-					// currCol is the last column
-					// decrement column pointer
-					else {
+					// user previously looking at the last column
+					else if (this.nextCol == null) {
 						this.nextCol = this.currCol;
 						this.currCol = this.currCol.prev;
 						this.prevCol = this.currCol.prev;
 					}
-					this.hideAllExcept(this.currCol, this.prevCol,
-							this.nextCol);
+					this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
 					this.updatePrevBtn();
 					this.updateNextBtn();
 				}
-				// desktop to tablet view
-				else {
-					this.init();
-				}
-			} else {// tablet to tablet view
-				// user previously looking at the first column
-				if (this.prevCol == null) {
-					this.prevCol = this.currCol;
-					this.currCol = this.currCol.next;
-					this.nextCol = this.currCol.next;
-				}
-				// user previously looking at the last column
-				else if (this.nextCol == null) {
-					this.nextCol = this.currCol;
-					this.currCol = this.currCol.prev;
-					this.prevCol = this.currCol.prev;
-				}
-				this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
-				this.determineButtonStatus(true);
-				this.updatePrevBtn();
-				this.updateNextBtn();
 			}
 		}
+	}
+	else{ // handles edge case for one or zero column 
+		this.hideAllExcept(this.currCol, this.prevCol, this.nextCol);
+		this.updatePrevBtn();
+		this.updateNextBtn();
 	}
 };
 /*
@@ -292,7 +315,6 @@ SwipeTable.prototype.goToNext = function() {
  * none
  */
 
-/* change to getElementById & test */
 SwipeTable.prototype.updatePrevBtn = function() {
 	if ($(window).width() <= 480) {
 		if (this.currCol.prev != null) {
@@ -347,20 +369,39 @@ SwipeTable.prototype.updateNextBtn = function() {
 		}
 	}
 };
-/* detect swipe touch motion for touch devices 
-   code reference from: http://labs.rampinteractive.co.uk/touchSwipe/demos/Single_swipe.html
-   @zoomTarget tracks current zoom level
-*/
-/*$(function(){
+$(function(){
 	$(".divTable").swipe({
 	    //show previous columns when swiped right
 	    swipe:function(event, direction, distance, duration, fingerCount) {
-	    	if(direction=="right"){
-	    		this.goToPrev();
-	    	}
-	    	else{
-	    		this.goToNext();
+	    	//get the column name to locate the source table
+	    	var TID = "." + event.target.classList[0];
+	    	var table = locateSrcTable(tableList,TID);
+	    	if(table!=null){
+		    	if(direction=="right"){
+		    		table.goToPrev();
+		    	}
+		    	else{
+		    		table.goToNext();
+	    		}
 	    	}
 	    }
 	});
-});*/
+});
+
+/*helper function to locate the source table for swipe touch motion
+@param tableList is declared in the head script of a html page
+@param TID is the element which invoked swipe touch motion*/
+function locateSrcTable(tableList, TID){
+	//check if target's column class name matches any of the tables' colList data
+	// return the corresponding table object
+	for(var i in tableList){
+		for(var j=0; j<tableList[i]["colList"]._length; j++){
+			if(tableList[i]["colList"].item(j).data.indexOf(TID)!==-1){
+				return tableList[i];
+			}
+		}
+		//check if swipe motion is detected on a fixed column
+		if(tableList[i]["fixedCol"].indexOf(TID)!==-1) return tableList[i];
+	}
+	return null;
+};
