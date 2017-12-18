@@ -13,11 +13,13 @@
 	<script src="scripts/swipe_class.js" type="text/javascript"></script>
 	<script src="https://rawgit.com/andrewrjones/doubly-linked-list-js/master/doubly-linked-list.js"></script>
 	<script src="https://rawgit.com/mattbryson/TouchSwipe-Jquery-Plugin/master/jquery.touchSwipe.js"></script>
+	<script src="https://rawgit.com/mattbryson/TouchSwipe-Jquery-Plugin/master/jquery.touchSwipe.js"></script>
 	<script>
 	var colList = new DLL.DoublyLinkedList();
 	var colList2 = new DLL.DoublyLinkedList();
 	var table = new SwipeTable(colList,"btnPrev","btnNext");
 	var table2 = new SwipeTable(colList2,"btnPrev2","btnNext2");
+	var tableList = [table,table2];
 	var prevScreen = null;
 	window.addEventListener('load', table.initCol.bind(table));
 	window.addEventListener('load', table2.initCol.bind(table2));
