@@ -1,0 +1,72 @@
+@media only screen and (max-width:625px) {
+	.col0 {
+		width: 50% !important;
+	}
+}
+/* DivTable.com */
+div.divTable{
+	display: table;
+	width: 100%;
+	border-collapse: collapse;
+}
+div.divTableRow{
+	display: table-row;
+}
+div.divTableHeading{
+	display: table-header-group;
+}
+
+div.divTableBody{
+	display: table-row-group;
+}
+/*general cell style*/
+div.divTableCell, div.divTableHead{
+	vertical-align: middle;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    font-family: inherit;
+    font-style: normal;
+    font-size: inherit;
+    color: inherit;
+    text-align: center;
+    line-height: 24px;
+	display: table-cell;
+	padding: 3px 10px;
+}
+
+.link {
+	text-decoration:none;
+	color: #06c !important;
+	/* color:#2A5467 !important; */
+}
+.link:hover{
+	cursor:pointer;
+}
+.button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	box-sizing: border-box;
+	background-color: #fff;
+	border-radius: .25em;
+	display: inline-block;
+	padding: 6px 16px;
+	border: 1px solid #ccc;
+	font-size: 14px
+}
+
+.button:hover {
+	background-color: lightgrey;
+	color: black !important;
+	cursor: pointer;
+}
+
+.previous{
+	background-color: #f1f1f1;
+	color: black;
+}
+
+.next {
+	background-color: #f1f1f1;
+	color: black;
+}

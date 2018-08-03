@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	lang="#{localeResolver.language}"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+<h:head>
+
+<link href="${contextRoot}/labourmarket/css/table.css" rel="stylesheet" />
+<script src="https://cdn.rawgit.com/andrewrjones/doubly-linked-list-js/7f74127/doubly-linked-list.js" />
+<script src="https://cdn.rawgit.com/mattbryson/TouchSwipe-Jquery-Plugin/0f31a29/jquery.touchSwipe.js"></script>
+<script src="${contextRoot}/labourmarket/scripts/swipe.js" type="text/javascript" />
+
+<!-- script for swipe table initialization -->
+<script>
+		//<![CDATA[
+		/*global tracker variables*/
+		var divtableObj = [];           
+		var ttableObj = [];
+		var divtableSavedStatus = [];
+		var ttableSavedStatus = [];
+		var prevScreen = null;
+		
+		/*locates responsible table where a swipe button is pressed*/
+		function buttonClick(srcObj){
+			var action = [-1];
+			var table = locateSrcTable(srcObj,action);
+			if(action[0]==0) table.goToPrev();
+			else if(action[0]==1) table.goToNext();
+		}
+		function locateSrcTable(srcObj,action){
+			//check if target's column class name matches any of the tables' button data
+			// return the corresponding table object
+			var TID = srcObj.id;
+			if((typeof divtableObj != "undefined" && divtableObj)||
+					(typeof ttableObj != "undefined" && ttableObj)){
+				for(var i=0; i<divtableObj.length; i++){
+					if(divtableObj[i]["btnPrev"].indexOf(TID)!==-1){ 
+						action[0] = 0;
+						return divtableObj[i];
+					}
+					if(divtableObj[i]["btnNext"].indexOf(TID)!==-1){
+						action[0] = 1;
+						return divtableObj[i];
+					}
+				}
+				for(var i=0; i<ttableObj.length; i++){
+					if(ttableObj[i]["btnPrev"].indexOf(TID)!==-1){ 
+						action[0] = 0;
+						return ttableObj[i];
+					}
+					if(ttableObj[i]["btnNext"].indexOf(TID)!==-1){
+						action[0] = 1;
+						return ttableObj[i];
+					}
+				}
+			}
+			return null;
+		}
+
+		/* detect swipe touch motion for touch devices 
+		code reference from: http://labs.rampinteractive.co.uk/touchSwipe/demos/Single_swipe.html
+		*/
+		var swipeOptions = {
+			swipe:function(event, direction, distance, duration, fingerCount) {
+				var buttons = $(event.currentTarget).prev().find('a'); //find the button elements of the source table
+		    	if(direction=="right"){
+		    		buttonClick(buttons[0]);		    		
+		    	}
+		    	else if(direction=="left"){
+		    		buttonClick(buttons[1]);
+		    	}
+			},
+			fallbackToMouseEvents: false,
+			allowPageScroll:"vertical",
+			
+		}
+		
+		/*invoke setupTable AFTER ajax rendering is finished
+		 * to avoid display override */
+		function setupSwipeOnSuccess(data) {
+		    if (data.status == "success") {
+				setupTable(1);
+		    }
+		}
+		/*remove & replace html elements via javascript will result 
+		  in their event binding loss that were added on page load.
+		  choose an element that will never gets removed from the page 
+		  (ie. document or body) and bind event handlers to that element instead.*/
+		$(document).ready(function(){
+		    $('body').on('click','.pagination',function(){
+		        setupTable(1);
+		    });
+		});
+		/*helper functions to remove auto generated swipe buttons*/
+		Element.prototype.remove = function() {
+		    this.parentElement.removeChild(this);
+		}
+		NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+		    for(var i = this.length - 1; i >= 0; i--) {
+		        if(this[i] && this[i].parentElement) {
+		            this[i].parentElement.removeChild(this[i]);
+		        }
+		    }
+		}
+		/*set up swipe table and generate classnames where applicable(table-taged tables only)
+		 * 0 flag represents an initial onload call, 1 otherwise in which the previously declared
+		 * swipe objects & button elements will be freed and recreated to rebind event handlers
+		 * call after event bind loss */
+		function setupTable(flag){
+			if(flag!=0){
+				//clear up any previously saved columns
+				divtableSavedStatus = [];
+				ttableSavedStatus = [];
+				for(var i=0; i<divtableObj.length; i++){
+					divtableSavedStatus.push(divtableObj[i].currCol.data); //save current column
+					divtableObj[i] == null;
+				}
+				for(var i=0; i<ttableObj.length; i++){
+					ttableSavedStatus.push(ttableObj[i].currCol.data);
+					ttableObj[i] == null;
+				}
+				divtableObj = [];
+				ttableObj = [];
+				//remove auto generated swipe button elements
+				revertClassNames();
+				document.getElementsByClassName("swipeButtons").remove();
+			}
+			//tables with div tags
+			var swipedivTableList = document.getElementsByClassName("divTable");
+			//tables with table tags
+			var swipetTableList = document.getElementsByClassName("autoSwipeClasses");
+			
+			if((typeof swipedivTableList != "undefined" && swipedivTableList)||
+					(typeof swipetTableList != "undefined" && swipetTableList)){
+				var index = [0];
+				//create div tag swipe objects if any
+				constructTableObj(swipedivTableList,index,"div");
+				//create table tag swipe objects if any
+				autoGenerateClassNames();
+				constructTableObj(swipetTableList,index,"table");
+				window.addEventListener('resize',function() { reconfigure();});
+			}
+		}
+		/*constructs swipe table objects and swipe buttons for each page with tables*/
+		function constructTableObj(list,index,tagType){
+			for(var i=0; i<list.length; i++){
+				index[0] += 1;
+				var btnPrev = "btnPrev" + index[0];
+				var btnNext = "btnNext" + index[0];
+				var colList = new DLL.DoublyLinkedList();
+				var table = new SwipeTable(colList,btnPrev,btnNext);
+				if(tagType == "div"){
+					//skip tables with "pass" mark
+					if(list[i].classList.contains("pass")){
+						continue;
+					}
+					list[i].id = autoTableID();
+					$("#"+list[i].id).swipe(swipeOptions); //add swipe touch event
+					autoButtons(btnPrev,btnNext,"#"+list[i].id);
+					divtableObj.push(table);
+					var savedCurrCol = (divtableSavedStatus.length > 0)?divtableSavedStatus[i]:"";
+					table.initCol(index,list[i].id,savedCurrCol);
+				}
+				else{
+					$("#"+list[i].id).swipe(swipeOptions); //add swipe touch event
+					autoButtons(btnPrev,btnNext,"#"+list[i].id);
+					ttableObj.push(table);
+					var savedCurrCol = (ttableSavedStatus.length > 0)?ttableSavedStatus[i]:"";
+					table.initCol(index,list[i].id,savedCurrCol);
+				}
+			}
+		}
+		/*generate class names for regularly structured table tags*/
+		function autoGenerateClassNames(){
+			//grab all swipe tables with table tags
+			var tables = document.getElementsByClassName("autoSwipeClasses");
+			for(var i=0; i<tables.length; i++){
+				var newClassName = "divTable".concat(" ", tables[i].className);
+				tables[i].className = newClassName;
+				tables[i].id = autoTableID();
+				//initializes only the essential classes for swipe table
+				//initialize tr>td and tr>th
+				var rowTagList = tables[i].getElementsByTagName("tr");
+				for(var j=0; j<rowTagList.length; j++){
+					var newClassName = "divTableRow".concat(" ", rowTagList[j].className);
+					rowTagList[j].className = newClassName;
+					var cellTagList = rowTagList[j]["children"];
+					for(var k=0; k<cellTagList.length; k++){
+						var newClassName = "col"+ k +" ";
+						cellTagList[k].className = newClassName.concat(cellTagList[k].className);
+					}
+				}
+			}
+		}
+		//revert auto generated class names
+		function revertClassNames(){
+			//grab all tables & remove initialized keyword
+			var allTables = document.getElementsByClassName("divTable");
+			$(allTables).removeClass("initialized");
+			//grab all swipe tables with table tags & remove all divTable keywords
+			var tables = document.getElementsByClassName("autoSwipeClasses");
+			$(tables).removeClass("divTable");
+			for(var i=0; i<tables.length; i++){
+				var rowTagList = tables[i].getElementsByTagName("tr");
+				$(rowTagList).removeClass("divTableRow");
+				for(var j=0; j<rowTagList.length; j++){
+					var cellTagList = rowTagList[j]["children"];
+					for(var k=0; k<cellTagList.length; k++){
+						var newClassName = "col"+ k +" ";
+						$(cellTagList[k]).removeClass(newClassName); 
+					}
+				}
+			}
+		}
+		/*generates random ID for swipe tables*/
+		function autoTableID(){
+			return Math.floor((Math.random() * 10000) + 1);
+		}
+		/*creates buttons right above each swipe table*/
+		function autoButtons(btnPrev, btnNext, tableID){
+			$( tableID ).before('<div class="buttons swipeButtons" align="right" style="font-size: 120%"><br />'+
+					'<a class=" previous button" id="' + btnPrev + '" onclick="buttonClick(this);">&#706;</a>'+ 
+					'<a class=" next button" id="' + btnNext + '" onclick="buttonClick(this);">&#707;</a><br /><br /></div>');
+		}
+		/*calls reconfiguration on all swipe tables on a page*/
+		function reconfigure(){
+			if((typeof divtableObj != "undefined" && divtableObj)||
+					(typeof ttableObj != "undefined" && ttableObj)){
+				for(var i=0; i<divtableObj.length; i++){
+					divtableObj[i].reconfig();
+				}
+				for(var i=0; i<ttableObj.length; i++){
+					ttableObj[i].reconfig();
+				}
+				prevScreen = window.innerWidth;
+			}
+		}
+		
+		/*optimized for lazyload: calls setup function only in sections that have divtables*/
+		function containsRegex(a, regex){
+			  for(var i = 0; i < a.length; i++) {
+			    if(String(a[i].className).search(regex) > -1){
+			      return i;
+			    }
+			  }
+			  return -1;
+		}
+		
+		function setupTableOpt(element){
+			if(containsRegex([element][0],/divTable/) > -1){
+				setupTable(1);
+			}
+		}
+		
+		/*calls setup function as soon as page elements are ready except when there is lazy load*/
+		$(function() {
+			if (document.getElementsByClassName("lazy").length < 1) {
+				window.addEventListener('load', function() { setupTable(0);});
+			}
+		});
+		//]]>
+		</script>
+
+
+</h:head>
+</html>
